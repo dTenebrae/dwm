@@ -53,7 +53,8 @@
                                * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
 #define INTERSECTC(x,y,w,h,z)   (MAX(0, MIN((x)+(w),(z)->x+(z)->w) - MAX((x),(z)->x)) \
                                * MAX(0, MIN((y)+(h),(z)->y+(z)->h) - MAX((y),(z)->y)))
-#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]))
+#define ISVISIBLEONTAG(C, T)    ((C->tags & T))
+#define ISVISIBLE(C)            ISVISIBLEONTAG(C, C->mon->tagset[C->mon->seltags])
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
@@ -183,6 +184,7 @@ static void arrange(Monitor *m);
 static void arrangemon(Monitor *m);
 static void attach(Client *c);
 static void attachstack(Client *c);
+static void attachx(Client *c);
 static void buttonpress(XEvent *e);
 static void checkotherwm(void);
 static void cleanup(void);
@@ -518,6 +520,57 @@ arrangemon(Monitor *m)
 	strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
 	if (m->lt[m->sellt]->arrange)
 		m->lt[m->sellt]->arrange(m);
+}
+
+void
+attachx(Client *c)
+{
+	Client *at;
+	unsigned int n;
+
+	switch (attachmode) {
+		case 1: // above
+			if (c->mon->sel == NULL || c->mon->sel == c->mon->clients || c->mon->sel->isfloating)
+				break;
+
+			for (at = c->mon->clients; at->next != c->mon->sel; at = at->next);
+			c->next = at->next;
+			at->next = c;
+			return;
+
+		case 2: // aside
+			for (at = c->mon->clients, n = 0; at; at = at->next)
+				if (!at->isfloating && ISVISIBLEONTAG(at, c->tags))
+					if (++n >= c->mon->nmaster)
+						break;
+
+			if (!at || !c->mon->nmaster)
+				break;
+
+			c->next = at->next;
+			at->next = c;
+			return;
+
+		case 3: // below
+			if (c->mon->sel == NULL || c->mon->sel->isfloating)
+				break;
+
+			c->next = c->mon->sel->next;
+			c->mon->sel->next = c;
+			return;
+
+		case 4: // bottom
+			for (at = c->mon->clients; at && at->next; at = at->next);
+			if (!at)
+				break;
+
+			at->next = c;
+			c->next = NULL;
+			return;
+	}
+
+	/* master (default) */
+	attach(c);
 }
 
 void
@@ -1688,7 +1741,7 @@ manage(Window w, XWindowAttributes *wa)
 		c->isfloating = c->oldstate = trans != None || c->isfixed;
 	if (c->isfloating)
 		XRaiseWindow(dpy, c->win);
-	attach(c);
+	attachx(c);
 	attachstack(c);
 	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
 		(unsigned char *) &(c->win), 1);
@@ -2331,7 +2384,7 @@ sendmon(Client *c, Monitor *m)
 	detachstack(c);
 	c->mon = m;
 	c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
-	attach(c);
+	attachx(c);
 	attachstack(c);
 	focus(NULL);
 	arrange(NULL);
