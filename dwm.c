@@ -45,6 +45,7 @@
 #include "util.h"
 
 /* macros */
+#define NUMTAGS                 9 /* the number of tags per monitor */
 #define BUTTONMASK              (ButtonPressMask|ButtonReleaseMask)
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask) & (ShiftMask|ControlMask|Mod1Mask|Mod2Mask|Mod3Mask|Mod4Mask|Mod5Mask))
 #define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
@@ -56,7 +57,7 @@
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
-#define TAGMASK                 ((1 << LENGTH(tags)) - 1)
+#define TAGMASK                 ((1 << NUMTAGS) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
 
 /* enums */
@@ -68,6 +69,12 @@ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
+enum {
+	IconsDefault,
+	IconsVacant,
+	IconsOccupied,
+	IconsLast
+}; /* icon sets */
 
 typedef union {
 	int i;
@@ -128,6 +135,7 @@ struct Monitor {
 	unsigned int tagset[2];
 	int showbar;
 	int topbar;
+	int iconset;
 	Client *clients;
 	Client *sel;
 	Client *stack;
@@ -161,6 +169,7 @@ static void configure(Client *c);
 static void configurenotify(XEvent *e);
 static void configurerequest(XEvent *e);
 static Monitor *createmon(void);
+static void cycleiconset(const Arg *arg);
 static void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
@@ -178,6 +187,7 @@ static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
+static char * geticon(Monitor *m, int tag, int iconset);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
@@ -211,6 +221,7 @@ static void sendmon(Client *c, Monitor *m);
 static void setclientstate(Client *c, long state);
 static void setfocus(Client *c);
 static void setfullscreen(Client *c, int fullscreen);
+static void seticonset(const Arg *arg);
 static void setlayout(const Arg *arg);
 static void setcfact(const Arg *arg);
 static void setmfact(const Arg *arg);
@@ -219,6 +230,7 @@ static void seturgent(Client *c, int urg);
 static void showhide(Client *c);
 static void spawn(const Arg *arg);
 static void tag(const Arg *arg);
+static char * tagicon(Monitor *m, int tag);
 static void tagmon(const Arg *arg);
 static void tile(Monitor *m);
 static void togglebar(const Arg *arg);
@@ -284,7 +296,7 @@ static Window root, wmcheckwin;
 #include "config.h"
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
-struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
+struct NumTags { char limitexceeded[NUMTAGS > 31 ? -1 : 1]; };
 
 /* function implementations */
 void
@@ -430,7 +442,7 @@ attachstack(Client *c)
 void
 buttonpress(XEvent *e)
 {
-	unsigned int i, x, click;
+	unsigned int i, x, tw, click;
 	Arg arg = {0};
 	Client *c;
 	Monitor *m;
@@ -445,10 +457,13 @@ buttonpress(XEvent *e)
 	}
 	if (ev->window == selmon->barwin) {
 		i = x = 0;
-		do
-			x += TEXTW(tags[i]);
-		while (ev->x >= x && ++i < LENGTH(tags));
-		if (i < LENGTH(tags)) {
+		do {
+			tw = TEXTW(tagicon(selmon, i));
+			if (tw <= lrpad)
+				continue;
+			x += tw;
+		} while (ev->x >= x && ++i < NUMTAGS);
+		if (i < NUMTAGS) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
 		} else if (ev->x < x + TEXTW(selmon->ltsymbol))
@@ -657,6 +672,24 @@ createmon(void)
 	m->lt[1] = &layouts[1 % LENGTH(layouts)];
 	strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
 	return m;
+}
+
+void
+cycleiconset(const Arg *arg)
+{
+	Monitor *m = selmon;
+	if (arg->i == 0)
+		return;
+	if (arg->i > 0) {
+		for (++m->iconset; m->iconset < IconsLast && tagicons[m->iconset][0] == NULL; ++m->iconset);
+		if (m->iconset >= IconsLast)
+			m->iconset = 0;
+	} else if (arg->i < 0) {
+		for (--m->iconset; m->iconset > 0 && tagicons[m->iconset][0] == NULL; --m->iconset);
+		if (m->iconset < 0)
+			for (m->iconset = IconsLast - 1; m->iconset > 0 && tagicons[m->iconset][0] == NULL; --m->iconset);
+	}
+	drawbar(m);
 }
 
 void
@@ -1012,6 +1045,7 @@ drawbar(Monitor *m)
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
 	unsigned int i, occ = 0, urg = 0;
+	char *icon;
 	Client *c;
 
 	if (!m->showbar)
@@ -1030,10 +1064,13 @@ drawbar(Monitor *m)
 			urg |= c->tags;
 	}
 	x = 0;
-	for (i = 0; i < LENGTH(tags); i++) {
-		w = TEXTW(tags[i]);
+	for (i = 0; i < NUMTAGS; i++) {
+		icon = tagicon(m, i);
+		w = TEXTW(icon);
+		if (w <= lrpad)
+			continue;
 		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+		drw_text(drw, x, 0, w, bh, lrpad / 2, icon, urg & 1 << i);
 		if (occ & 1 << i)
 			drw_rect(drw, x + boxs, boxs, boxw, boxw,
 				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
@@ -1251,6 +1288,20 @@ getatomprop(Client *c, Atom prop)
 		XFree(p);
 	}
 	return atom;
+}
+
+char *
+geticon(Monitor *m, int tag, int iconset)
+{
+	int i;
+	int tagindex = tag + NUMTAGS * m->num;
+	for (i = 0; i < LENGTH(tagicons[iconset]) && tagicons[iconset][i] != NULL; ++i);
+	if (i == 0)
+		tagindex = 0;
+	else if (tagindex >= i)
+		tagindex = tagindex % i;
+
+	return tagicons[iconset][tagindex];
 }
 
 int
@@ -2142,6 +2193,15 @@ setfullscreen(Client *c, int fullscreen)
 }
 
 void
+seticonset(const Arg *arg)
+{
+	if (arg->i >= 0 && arg->i < IconsLast) {
+		selmon->iconset = arg->i;
+		drawbar(selmon);
+	}
+}
+
+void
 setlayout(const Arg *arg)
 {
 	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
@@ -2334,6 +2394,24 @@ tag(const Arg *arg)
 		focus(NULL);
 		arrange(selmon);
 	}
+}
+
+char *
+tagicon(Monitor *m, int tag)
+{
+	Client *c;
+	char *icon;
+	for (c = m->clients; c && (!(c->tags & 1 << tag)); c = c->next);
+	// for (c = m->clients; c && (!(c->tags & 1 << tag) || HIDDEN(c)); c = c->next); // awesomebar / wintitleactions compatibility
+	if (c && tagicons[IconsOccupied][0] != NULL)
+		icon = geticon(m, tag, IconsOccupied);
+	else {
+		icon = geticon(m, tag, m->iconset);
+		if (TEXTW(icon) <= lrpad && m->tagset[m->seltags] & 1 << tag)
+			icon = geticon(m, tag, IconsVacant);
+	}
+
+	return icon;
 }
 
 void

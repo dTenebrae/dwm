@@ -18,8 +18,13 @@ static const char *colors[][3]      = {
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
 };
 
-/* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+/* tagging: refer to https://github.com/bakkeby/patches/wiki/tagicons */
+static const char *tags[NUMTAGS] = { NULL };  /* left for compatibility reasons, i.e. code that checks LENGTH(tags) */
+static char *tagicons[][NUMTAGS] = {
+	[IconsDefault]        = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+	[IconsVacant]         = { NULL },
+	[IconsOccupied]       = { NULL },
+};
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -96,6 +101,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_a,      seticonset,     {.i = 0 } },
+	{ MODKEY|ShiftMask,             XK_b,      seticonset,     {.i = 1 } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
@@ -135,5 +142,7 @@ static const Button buttons[] = {
 	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
+	{ ClkTagBar,            0,              Button4,        cycleiconset,   {.i = +1 } },
+	{ ClkTagBar,            0,              Button5,        cycleiconset,   {.i = -1 } },
 };
 
