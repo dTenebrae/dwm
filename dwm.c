@@ -76,6 +76,7 @@ enum {
 	IconsDefault,
 	IconsVacant,
 	IconsOccupied,
+	IconsSelected,
 	IconsLast
 }; /* icon sets */
 
@@ -3035,7 +3036,9 @@ tagicon(Monitor *m, int tag)
 	char *icon;
 	for (c = m->clients; c && (!(c->tags & 1 << tag)); c = c->next);
 	// for (c = m->clients; c && (!(c->tags & 1 << tag) || HIDDEN(c)); c = c->next); // awesomebar / wintitleactions compatibility
-	if (c && tagicons[IconsOccupied][0] != NULL)
+	if (m->tagset[m->seltags] & 1 << tag && tagicons[IconsSelected][0] != NULL)
+		icon = geticon(m, tag, IconsSelected);
+	else if (c && tagicons[IconsOccupied][0] != NULL)
 		icon = geticon(m, tag, IconsOccupied);
 	else {
 		icon = geticon(m, tag, m->iconset);
