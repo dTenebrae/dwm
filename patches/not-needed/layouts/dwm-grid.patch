@@ -1,0 +1,80 @@
+From 8916c513781173ec0fb3d4192b6c606c3904ec36 Mon Sep 17 00:00:00 2001
+From: tenebrae <dtenebrae@gmail.com>
+Date: Sun, 30 Apr 2023 14:34:30 +0300
+Subject: [PATCH] dwm-grid
+
+---
+ config.def.h |  2 ++
+ dwm.c        | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
+
+diff --git a/config.def.h b/config.def.h
+index 25da9cb..20dc4cb 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -66,6 +66,7 @@ static const Layout layouts[] = {
+ 	{ "><>",      NULL },    /* no layout function means floating behavior */
+ 	{ "[M]",      monocle },
+ 	{ "DD",       doubledeck },
++	{ "HHH",      grid },
+ };
+ 
+ /* key definitions */
+@@ -116,6 +117,7 @@ static const Key keys[] = {
+ 	{ MODKEY,                       XK_e,      setlayout,      {.v = &layouts[1]} },
+ 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+ 	{ MODKEY,                       XK_r,      setlayout,      {.v = &layouts[3]} },
++	{ MODKEY,                       XK_g,      setlayout,      {.v = &layouts[4]} },
+ 	{ MODKEY,                       XK_space,  setlayout,      {0} },
+ 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
+ 	{ MODKEY,                       XK_f,      togglefullscreen, {0} },
+diff --git a/dwm.c b/dwm.c
+index 6fa17f4..286b38a 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -206,6 +206,7 @@ static void detach(Client *c);
+ static void detachstack(Client *c);
+ static Monitor *dirtomon(int dir);
+ static void doubledeck(Monitor *m);
++static void grid(Monitor *m);
+ static void dragmfact(const Arg *arg);
+ static void dragcfact(const Arg *arg);
+ static void drawbar(Monitor *m);
+@@ -1294,6 +1295,34 @@ doubledeck(Monitor *m) {
+ 			resize(c, m->wx + mw, m->wy, m->ww - mw - (2*c->bw), m->wh - (2*c->bw), False);
+ }
+ 
++void
++grid(Monitor *m) {
++	unsigned int i, n, cx, cy, cw, ch, aw, ah, cols, rows;
++	Client *c;
++
++	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next))
++		n++;
++
++	/* grid dimensions */
++	for(rows = 0; rows <= n/2; rows++)
++		if(rows*rows >= n)
++			break;
++	cols = (rows && (rows - 1) * rows >= n) ? rows - 1 : rows;
++
++	/* window geoms (cell height/width) */
++	ch = m->wh / (rows ? rows : 1);
++	cw = m->ww / (cols ? cols : 1);
++	for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next)) {
++		cx = m->wx + (i / rows) * cw;
++		cy = m->wy + (i % rows) * ch;
++		/* adjust height/width of last row/column's windows */
++		ah = ((i + 1) % rows == 0) ? m->wh - ch * rows : 0;
++		aw = (i >= rows * (cols - 1)) ? m->ww - cw * cols : 0;
++		resize(c, cx, cy, cw - 2 * c->bw + aw, ch - 2 * c->bw + ah, False);
++		i++;
++	}
++}
++
+ void
+ drawbar(Monitor *m)
+ {
+-- 
+2.40.1
+
