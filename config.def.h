@@ -123,63 +123,63 @@ static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_d,      spawn,          {.v = roficmd } },
-	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_z,      spawn,          {.v = slock } },
-	{ MODKEY,                       XK_c,      spawn,          {.v = chromecmd } },
-	{ MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },
-	{ MODKEY,                       XK_b,      togglebar,      {0} },
-	{ MODKEY,                       XK_Left,   focusdir,       {.i = 0 } }, // left
-	{ MODKEY,                       XK_Right,  focusdir,       {.i = 1 } }, // right
-	{ MODKEY,                       XK_Up,     focusdir,       {.i = 2 } }, // up
-	{ MODKEY,                       XK_Down,   focusdir,       {.i = 3 } }, // down
-	{ MODKEY|ControlMask,           XK_Left,   placedir,       {.i = 0 } }, // left
-	{ MODKEY|ControlMask,           XK_Right,  placedir,       {.i = 1 } }, // right
-	{ MODKEY|ControlMask,           XK_Up,     placedir,       {.i = 2 } }, // up
-	{ MODKEY|ControlMask,           XK_Down,   placedir,       {.i = 3 } }, // down
-	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
-	{ MODKEY,                       XK_o,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
-	{ MODKEY|ShiftMask,             XK_h,      setcfact,       {.f = +0.25} },
-	{ MODKEY|ShiftMask,             XK_l,      setcfact,       {.f = -0.25} },
-	{ MODKEY|ShiftMask,             XK_Return, zoom,           {0} },
-	{ MODKEY,                       XK_k,      incrgaps,       {.i = +1 } },
-	{ MODKEY,                       XK_j,      incrgaps,       {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_k,      incrigaps,      {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_j,      incrigaps,      {.i = -1 } },
-	{ MODKEY|ControlMask,           XK_k,      incrogaps,      {.i = +1 } },
-	{ MODKEY|ControlMask,           XK_j,      incrogaps,      {.i = -1 } },
-	{ MODKEY|ControlMask,           XK_0,      togglegaps,     {0} },
-	{ MODKEY|ShiftMask,             XK_0,      defaultgaps,    {0} },
-	{ MODKEY,                       XK_Tab,    view,           {0} },
-	{ MODKEY,                       XK_q,      killclient,     {0} },
-	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
-	{ MODKEY,                       XK_e,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
-	{ MODKEY,                       XK_space,  setlayout,      {0} },
-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-	{ MODKEY,                       XK_f,      togglefullscreen, {0} },
+	{ MODKEY,                       XK_d,      spawn,                {.v = roficmd } },
+	{ MODKEY,                       XK_Return, spawn,                {.v = termcmd } },
+	{ MODKEY,                       XK_z,      spawn,                {.v = slock } },
+	{ MODKEY,                       XK_c,      spawn,                {.v = chromecmd } },
+	{ MODKEY,                       XK_grave,  togglescratch,        {.v = scratchpadcmd } },
+	{ MODKEY,                       XK_b,      togglebar,            {0} },
+	{ MODKEY,                       XK_Left,   focusdir,             {.i = 0 } }, // left
+	{ MODKEY,                       XK_Right,  focusdir,             {.i = 1 } }, // right
+	{ MODKEY,                       XK_Up,     focusdir,             {.i = 2 } }, // up
+	{ MODKEY,                       XK_Down,   focusdir,             {.i = 3 } }, // down
+	{ MODKEY|ControlMask,           XK_Left,   placedir,             {.i = 0 } }, // left
+	{ MODKEY|ControlMask,           XK_Right,  placedir,             {.i = 1 } }, // right
+	{ MODKEY|ControlMask,           XK_Up,     placedir,             {.i = 2 } }, // up
+	{ MODKEY|ControlMask,           XK_Down,   placedir,             {.i = 3 } }, // down
+	{ MODKEY,                       XK_i,      incnmaster,           {.i = +1 } },
+	{ MODKEY,                       XK_o,      incnmaster,           {.i = -1 } },
+	{ MODKEY,                       XK_h,      setmfact,             {.f = -0.05} },
+	{ MODKEY,                       XK_l,      setmfact,             {.f = +0.05} },
+	{ MODKEY|ShiftMask,             XK_h,      setcfact,             {.f = +0.25} },
+	{ MODKEY|ShiftMask,             XK_l,      setcfact,             {.f = -0.25} },
+	{ MODKEY|ShiftMask,             XK_Return, zoom,                 {0} },
+	{ MODKEY,                       XK_k,      incrgaps,             {.i = +1 } },
+	{ MODKEY,                       XK_j,      incrgaps,             {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_k,      incrigaps,            {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_j,      incrigaps,            {.i = -1 } },
+	{ MODKEY|ControlMask,           XK_k,      incrogaps,            {.i = +1 } },
+	{ MODKEY|ControlMask,           XK_j,      incrogaps,            {.i = -1 } },
+	{ MODKEY|ControlMask,           XK_0,      togglegaps,           {0} },
+	{ MODKEY|ShiftMask,             XK_0,      defaultgaps,          {0} },
+	{ MODKEY,                       XK_Tab,    view,                 {0} },
+	{ MODKEY,                       XK_q,      killclient,           {0} },
+	{ MODKEY,                       XK_t,      setlayout,            {.v = &layouts[0]} },
+	{ MODKEY,                       XK_e,      setlayout,            {.v = &layouts[1]} },
+	{ MODKEY,                       XK_m,      setlayout,            {.v = &layouts[2]} },
+	{ MODKEY,                       XK_space,  setlayout,            {0} },
+	{ MODKEY|ShiftMask,             XK_space,  togglefloating,       {0} },
+	{ MODKEY,                       XK_f,      togglefullscreen,     {0} },
 	{ MODKEY|ShiftMask,             XK_f,      togglefakefullscreen, {0} },
-	{ MODKEY,                       XK_comma,  focusmon,       {.i = -1 } },
-	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY|ControlMask,           XK_comma,  cyclelayout,    {.i = -1 } },
-	{ MODKEY|ControlMask,           XK_period, cyclelayout,    {.i = +1 } },
-	{ Mod1Mask,            		XK_Tab,    altTabStart,	   {0} },
-	{ MODKEY|ShiftMask,             XK_a,      seticonset,     {.i = 0 } },
-	{ MODKEY|ShiftMask,             XK_b,      seticonset,     {.i = 1 } },
-	TAGKEYS(                        XK_1,                      0)
-	TAGKEYS(                        XK_2,                      1)
-	TAGKEYS(                        XK_3,                      2)
-	TAGKEYS(                        XK_4,                      3)
-	TAGKEYS(                        XK_5,                      4)
-	TAGKEYS(                        XK_6,                      5)
-	TAGKEYS(                        XK_7,                      6)
-	TAGKEYS(                        XK_8,                      7)
-	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+	{ MODKEY,                       XK_comma,  focusmon,             {.i = -1 } },
+	{ MODKEY,                       XK_period, focusmon,             {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_comma,  tagmon,               {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_period, tagmon,               {.i = +1 } },
+	{ MODKEY|ControlMask,           XK_comma,  cyclelayout,          {.i = -1 } },
+	{ MODKEY|ControlMask,           XK_period, cyclelayout,          {.i = +1 } },
+	{ Mod1Mask,            		XK_Tab,    altTabStart,	         {0} },
+	{ MODKEY|ShiftMask,             XK_a,      seticonset,           {.i = 0 } },
+	{ MODKEY|ShiftMask,             XK_b,      seticonset,           {.i = 1 } },
+	TAGKEYS(                        XK_1,                            0)
+	TAGKEYS(                        XK_2,                            1)
+	TAGKEYS(                        XK_3,                            2)
+	TAGKEYS(                        XK_4,                            3)
+	TAGKEYS(                        XK_5,                            4)
+	TAGKEYS(                        XK_6,                            5)
+	TAGKEYS(                        XK_7,                            6)
+	TAGKEYS(                        XK_8,                            7)
+	TAGKEYS(                        XK_9,                            8)
+	{ MODKEY|ShiftMask,             XK_q,      quit,                 {0} },
 };
 
 /* button definitions */
@@ -200,17 +200,17 @@ static const Button buttons[] = {
 	 * to control these separately (i.e. to retain the feature to move a tiled window
 	 * into a floating position).
 	 */
-	{ ClkClientWin,         MODKEY,         Button1,        moveorplace,    {.i = 1} },
-	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
-	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
-	{ ClkClientWin,         MODKEY|ShiftMask, Button1,      dragmfact,      {0} },
-	{ ClkClientWin,         MODKEY|ShiftMask, Button3,      dragcfact,      {0} },
-	{ ClkTagBar,            0,              Button1,        view,           {0} },
-	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
-	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
-	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
-	{ ClkTagBar,            0,              Button4,        cycleiconset,   {.i = +1 } },
-	{ ClkTagBar,            0,              Button5,        cycleiconset,   {.i = -1 } },
+	{ ClkClientWin,         MODKEY,           Button1,        moveorplace,    {.i = 1} },
+	{ ClkClientWin,         MODKEY,           Button2,        togglefloating, {0} },
+	{ ClkClientWin,         MODKEY,           Button3,        resizemouse,    {0} },
+	{ ClkClientWin,         MODKEY|ShiftMask, Button1,        dragmfact,      {0} },
+	{ ClkClientWin,         MODKEY|ShiftMask, Button3,        dragcfact,      {0} },
+	{ ClkTagBar,            0,                Button1,        view,           {0} },
+	{ ClkTagBar,            0,                Button3,        toggleview,     {0} },
+	{ ClkTagBar,            MODKEY,           Button1,        tag,            {0} },
+	{ ClkTagBar,            MODKEY,           Button3,        toggletag,      {0} },
+	{ ClkTagBar,            0,                Button4,        cycleiconset,   {.i = +1 } },
+	{ ClkTagBar,            0,                Button5,        cycleiconset,   {.i = -1 } },
 };
 
 static const char *ipcsockpath = "/tmp/dwm.sock";
