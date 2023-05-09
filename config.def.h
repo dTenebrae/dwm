@@ -37,9 +37,10 @@ static const char *const autostart[] = {
 /* tagging: refer to https://github.com/bakkeby/patches/wiki/tagicons */
 static const char *tags[NUMTAGS] = { NULL };  /* left for compatibility reasons, i.e. code that checks LENGTH(tags) */
 static char *tagicons[][NUMTAGS] = {
-	[IconsDefault]        = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+	[IconsDefault]        = { "○" },
 	[IconsVacant]         = { NULL },
-	[IconsOccupied]       = { "<1>", "<2>", "<3>", "<4>", "<5>", "<6>", "<7>", "<8>", "<9>" },
+	[IconsOccupied]       = { "☉" },
+	[IconsSelected]       = { "◉" },
 };
 
 static const Rule rules[] = {
