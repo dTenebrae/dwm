@@ -11,8 +11,8 @@ static       int smartgaps          = 0;        /* 1 means no outer gap when the
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int attachmode         = 0;        /* 0 master (default), 1 = above, 2 = aside, 3 = below, 4 = bottom */
-static const char *fonts[]          = { "JetBrainsMono Nerd Font:size=12" };
-static const char dmenufont[]       = "JetBrainsMono Nerd Font:size=12";
+static const char *fonts[]          = { "JetBrainsMono Nerd Font:size=10" };
+static const char dmenufont[]       = "JetBrainsMono Nerd Font:size=10";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -22,25 +22,35 @@ static const char col_blue[]        = "#2C78BF";
 static const char col_yellow[]      = "#fe8019";
 static const char col_orange[]      = "#d65d0e";
 static const char col_rust[]        = "#8b4000";
+static const char col_pink[]        = "#ff4499";
 static const char col_green[]       = "#98971a";
 static const char col_brown[]       = "#4e3946";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_rust,  col_rust  },
+	[SchemeSel]  = { col_gray4, col_gray2,  col_pink  },
 };
 static const char *const autostart[] = {
-	"st", NULL,
+	"alacritty", NULL,
+	"dwmblocks", NULL,
 	NULL /* terminate */
 };
 
 /* tagging: refer to https://github.com/bakkeby/patches/wiki/tagicons */
+//static const char *tags[NUMTAGS] = { NULL };  [> left for compatibility reasons, i.e. code that checks LENGTH(tags) <]
+//static char *tagicons[][NUMTAGS] = {
+	//[IconsDefault]        = { "○" },
+	//[IconsVacant]         = { NULL },
+	//[IconsOccupied]       = { "☉" },
+	//[IconsSelected]       = { "◉" },
+//};
+
+/* tagging: refer to https://github.com/bakkeby/patches/wiki/tagicons */
 static const char *tags[NUMTAGS] = { NULL };  /* left for compatibility reasons, i.e. code that checks LENGTH(tags) */
 static char *tagicons[][NUMTAGS] = {
-	[IconsDefault]        = { "○" },
+	[IconsDefault]        = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
 	[IconsVacant]         = { NULL },
-	[IconsOccupied]       = { "☉" },
-	[IconsSelected]       = { "◉" },
+	[IconsOccupied]       = { NULL },
 };
 
 static const Rule rules[] = {
@@ -106,9 +116,9 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *roficmd[]  = { "rofi", "-show", "run", NULL };
-static const char *termcmd[]  = { "st", NULL };
+static const char *termcmd[]  = { "alacritty", NULL };
 static const char *slock[]  = { "slock", NULL };
-static const char *chromecmd[]  = { "vivaldi-stable", NULL };
+static const char *chromecmd[]  = { "google-chrome-unstable", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
 
@@ -135,14 +145,14 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_h,      setcfact,             {.f = +0.25} },
 	{ MODKEY|ShiftMask,             XK_l,      setcfact,             {.f = -0.25} },
 	{ MODKEY|ShiftMask,             XK_Return, zoom,                 {0} },
-	{ MODKEY,                       XK_k,      incrgaps,             {.i = +1 } },
-	{ MODKEY,                       XK_j,      incrgaps,             {.i = -1 } },
-	{ MODKEY|ShiftMask,             XK_k,      incrigaps,            {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_j,      incrigaps,            {.i = -1 } },
-	{ MODKEY|ControlMask,           XK_k,      incrogaps,            {.i = +1 } },
-	{ MODKEY|ControlMask,           XK_j,      incrogaps,            {.i = -1 } },
-	{ MODKEY|ControlMask,           XK_0,      togglegaps,           {0} },
-	{ MODKEY|ShiftMask,             XK_0,      defaultgaps,          {0} },
+	//{ MODKEY,                       XK_k,      incrgaps,             {.i = +1 } },
+	//{ MODKEY,                       XK_j,      incrgaps,             {.i = -1 } },
+	//{ MODKEY|ShiftMask,             XK_k,      incrigaps,            {.i = +1 } },
+	//{ MODKEY|ShiftMask,             XK_j,      incrigaps,            {.i = -1 } },
+	//{ MODKEY|ControlMask,           XK_k,      incrogaps,            {.i = +1 } },
+	//{ MODKEY|ControlMask,           XK_j,      incrogaps,            {.i = -1 } },
+	//{ MODKEY|ControlMask,           XK_0,      togglegaps,           {0} },
+	//{ MODKEY|ShiftMask,             XK_0,      defaultgaps,          {0} },
 	{ MODKEY,                       XK_Tab,    view,                 {0} },
 	{ MODKEY,                       XK_q,      killclient,           {0} },
 	{ MODKEY,                       XK_t,      setlayout,            {.v = &layouts[0]} },
